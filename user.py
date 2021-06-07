@@ -1,0 +1,1 @@
+songDirectory = "C:/Users/Hans/Desktop/songs"
