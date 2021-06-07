@@ -1,1 +1,3 @@
+eyed3
 librosa
+ffmpeg-python

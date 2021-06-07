@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.ttk import Progressbar
+from tkinter import ttk
 from tkinter import messagebox
 import tkinter
 from tkinter import font
@@ -19,17 +20,18 @@ def getInterval(songLength):
     return  
 
 root = Tk()
-root.geometry("800x700")
+root.geometry("1000x650")
 root.title("MoodSic")
 fnt = font.Font(size = 12)
 w = PanedWindow(root)
 controlPanel = PanedWindow(root)
 
-sb = Scrollbar(w)
+""" sb = Scrollbar(w)
 sb.pack(side = RIGHT, fill = BOTH)
 lb = Listbox(w, height = 33, width = 90, font = fnt, yscrollcommand=sb.set)
-lb.pack(side = LEFT)
+lb.pack(side = LEFT) """
 
+lbl = Label(root, text = "My Music", font = 'Helvetica 18 bold')
 playButton = Button(controlPanel, text = "Play", font = fnt, command = playSong)
 nextButton = Button(controlPanel, text = "Next", font = fnt)
 previousButton = Button(controlPanel, text = "Previous", font = fnt)
@@ -40,15 +42,39 @@ nextButton.grid(row = 0, column = 2, padx = 20)
 
 progressBar = Progressbar(root, orient = HORIZONTAL, length = 600, mode = 'determinate')
 
-w.pack(side = TOP, fill = "x")
-progressBar.place(x = 70, y = 635)
-controlPanel.place(x = 250, y = 660)
+lbl.place(x = 170, y = 0)
+w.place(x = 170, y = 40)
+progressBar.place(x = 230, y = 580)
+controlPanel.place(x = 410, y = 610)
 
 with open("song_data.py", "rb") as fp:
     temp = pickle.load(fp)
 
-for x in range(len(temp)):
-    lb.insert(x, temp[x][0])
+
+
+tv = ttk.Treeview(w, height = 25)
+tv['columns']=('Title', 'Artist', 'Duration', 'Tempo')
+tv.column('#0', width=0, stretch=NO)
+tv.column('Title', anchor=CENTER, width=400)
+tv.column('Artist', anchor=CENTER, width=200)
+tv.column('Duration', anchor=CENTER, width=80)
+tv.column('Tempo', anchor=CENTER, width=80)
+
+tv.heading('#0', text='', anchor=CENTER)
+tv.heading('Title', text='Title', anchor=CENTER)
+tv.heading('Artist', text='Artist', anchor=CENTER)
+tv.heading('Duration', text='Duration', anchor=CENTER)
+tv.heading('Tempo', text='Tempo', anchor=CENTER)
+
+for x in range(len(temp)):    
+    tv.insert(parent='', index=x, iid=x, text='', values=(temp[x][3],'Mama mo', str(int(temp[x][2]/60)) + ':' + str(int(temp[x][2])%60), int(temp[x][1])))
+
+tv.pack(fill = "x")
+
+""" for x in range(len(temp)):
+    lb.insert(x, temp[x][3])
+    lb.insert(x, temp[x][3])
+    lb.insert(x, temp[x][3]) """
 
 
 root.mainloop()

@@ -1,1 +1,1 @@
-songDirectory = "C:/Users/Hans/Desktop/songs"
+songDirectory = "C:/Users/Ega/OneDrive/Desktop/Songs"

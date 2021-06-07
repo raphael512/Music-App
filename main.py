@@ -1,10 +1,9 @@
-#Hello?
-
 from user import songDirectory
 import tkinter as tk
 from tkinter import messagebox
 import librosa
 import pickle
+import eyed3
 from tkinter import filedialog
 
 songList = []
@@ -23,12 +22,16 @@ if(songDirectory == ""):
     songs = librosa.util.find_files(songDirectory)
     for x in songs:
         y, sr = librosa.load(x)
+        audioFile = eyed3.load(x)
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
         duration = librosa.get_duration(y = y, sr = sr)
-        songList.append([x, tempo, duration])
+        songList.append([x, tempo, duration, audioFile.tag.title])
 
     with open("song_data.py", "wb") as fp:
         pickle.dump(songList, fp)
 
-    messagebox.showinfo("Success!", "Audio loading finished, please restart the program")
+    if(len(songList) == 0):
+        messagebox.showinfo("Error!", "No songs found on the folder provided.")
+    else:
+        messagebox.showinfo("Success!", "Audio loading finished, please restart the program")
 
