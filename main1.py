@@ -7,14 +7,15 @@ from tkinter import font
 import pickle
 
 def playSong():
-    if(playButton['text'] == "Pause"):
+    """ if(playButton['text'] == "Pause"):
         val = progressBar['value']
         progressBar.stop()
         progressBar['value'] = val
         playButton['text'] = "Play"
     else:
         playButton['text'] = "Pause"
-        progressBar.start(interval = 2150)
+        progressBar.start(interval = 2150) """
+    return
 
 def getInterval(songLength):
     return  
@@ -32,24 +33,31 @@ lb = Listbox(w, height = 33, width = 90, font = fnt, yscrollcommand=sb.set)
 lb.pack(side = LEFT) """
 
 lbl = Label(root, text = "My Music", font = 'Helvetica 18 bold')
-playButton = Button(controlPanel, text = "Play", font = fnt, command = playSong)
-nextButton = Button(controlPanel, text = "Next", font = fnt)
-previousButton = Button(controlPanel, text = "Previous", font = fnt)
+detectEmotion = Button(root, text = "DETECT EMOTION", font = 'Arial 11 bold', background = "#AED5C0")
 
-previousButton.grid(row = 0, column = 0, padx = 20)
-playButton.grid(row = 0, column = 1, padx = 20)
-nextButton.grid(row = 0, column = 2, padx = 20)
+playImage = PhotoImage(file = "./res/playButton.png")
+nextImage = PhotoImage(file = "./res/nextButton.png")
+prevImage = PhotoImage(file = "./res/prevButton.png")
+progBar = PhotoImage(file = "./res/progBar.png")
 
-progressBar = Progressbar(root, orient = HORIZONTAL, length = 600, mode = 'determinate')
+playButton = Button(controlPanel, image = playImage, font = fnt, command = playSong)
+nextButton = Button(controlPanel, image = nextImage, font = fnt)
+previousButton = Button(controlPanel, image = prevImage, font = fnt)
+
+previousButton.grid(row = 0, column = 0)
+playButton.grid(row = 0, column = 1, padx = 30)
+nextButton.grid(row = 0, column = 2)
+
+progressBar = Label(root, image = progBar)
 
 lbl.place(x = 170, y = 0)
 w.place(x = 170, y = 40)
-progressBar.place(x = 230, y = 580)
-controlPanel.place(x = 410, y = 610)
+progressBar.place(x = 390, y = 625)
+detectEmotion.place(x = 12, y = 490)
+controlPanel.place(x = 550, y = 580)
 
 with open("song_data.py", "rb") as fp:
     temp = pickle.load(fp)
-
 
 
 tv = ttk.Treeview(w, height = 25)
@@ -66,8 +74,11 @@ tv.heading('Artist', text='Artist', anchor=CENTER)
 tv.heading('Duration', text='Duration', anchor=CENTER)
 tv.heading('Tempo', text='Tempo', anchor=CENTER)
 
-for x in range(len(temp)):    
-    tv.insert(parent='', index=x, iid=x, text='', values=(temp[x][3],'Mama mo', str(int(temp[x][2]/60)) + ':' + str(int(temp[x][2])%60), int(temp[x][1])))
+for x in range(len(temp)):
+    if(int(temp[x][2])%60 < 10):    
+        tv.insert(parent='', index=x, iid=x, text='', values=(temp[x][3], temp[x][4], str(int(temp[x][2]/60)) + ':0' + str(int(temp[x][2])%60), int(temp[x][1])))
+    else:
+        tv.insert(parent='', index=x, iid=x, text='', values=(temp[x][3], temp[x][4], str(int(temp[x][2]/60)) + ':' + str(int(temp[x][2])%60), int(temp[x][1])))
 
 tv.pack(fill = "x")
 

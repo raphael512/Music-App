@@ -25,7 +25,7 @@ if(songDirectory == ""):
         audioFile = eyed3.load(x)
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
         duration = librosa.get_duration(y = y, sr = sr)
-        songList.append([x, tempo, duration, audioFile.tag.title])
+        songList.append([x, tempo, duration, audioFile.tag.title, audioFile.tag.artist])
 
     with open("song_data.py", "wb") as fp:
         pickle.dump(songList, fp)
