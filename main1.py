@@ -7,7 +7,7 @@ from tkinter import font
 import pickle
 import vlc
 import time
-from playlistTest import VLC
+from playlist import VLC
 
 class cancelId:
     def __init__(self):
@@ -27,7 +27,6 @@ def playSong(song):
     temp = tv.item(song, 'values')   
     timeArr = temp[2].split(':')
     timeArr = int(int(timeArr[0])*60) + int(timeArr[1])
-    print(timeArr)
     progressBarFunc(int(timeArr*.01*1000))
     sing = vlc.MediaPlayer(songDir[temp[0]])
     sing.play()

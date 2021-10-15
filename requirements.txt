@@ -1,5 +1,7 @@
+tinytag
 eyed3
 librosa
 ffmpeg-python
 python-vlc
-gdown
+mutagen
+glob
