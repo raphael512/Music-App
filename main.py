@@ -19,7 +19,13 @@ if(songDirectory == ""):
     temp = open("user.py", "w")
     temp.write('songDirectory = "' + songDirectory + '"')
     messagebox.showinfo("Success!", "Song directory found, please wait. This will take a long time depending on the number of music you have.")
-    print(songDirectory)
+
+    for x in glob(songDirectory + "/*.flac"):
+        songs.append(x)
+
+    for x in glob(songDirectory + "/*.mp3"):
+        songs.append(x)
+
     for x in glob(songDirectory + "/**/*.flac"):
         songs.append(x)
 
