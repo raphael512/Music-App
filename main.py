@@ -38,7 +38,14 @@ if(songDirectory == ""):
         audioFile = TinyTag.get(x)
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
         duration = librosa.get_duration(y = y, sr = sr)
-        songList.append([x, tempo, duration, audioFile.title, audioFile.artist])
+        if(audioFile.title == True and audioFile.artist == True):
+            songList.append([x, tempo, duration, audioFile.title, audioFile.artist])
+        elif(audioFile.title == True and audioFile.artist == False):
+            songList.append([x, tempo, duration, audioFile.title, "None"])
+        elif(audioFile.title == False and audioFile.artist == True):
+            songList.append([x, tempo, duration, x, audioFile.artist])
+        else:
+            songList.append([x, tempo, duration, x, "None"])
 
     with open("song_data.py", "wb") as fp:
         pickle.dump(songList, fp)

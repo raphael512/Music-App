@@ -9,8 +9,9 @@ import vlc
 import time
 from playlist import VLC
 import random
+from tinytag import TinyTag
 
-class playing:
+""" class playing:
     def __init__(self):
         self.player = 0
         self.songHistory = []
@@ -22,14 +23,16 @@ class playing:
         self.player.stop()
 
     def setSong(self, songInfo):
-        self.player = vlc.MediaPlayer(songInfo)
+        self.player = vlc.MediaPlayer(songInfo) """
+
 
 class stack:
     def __init__(self):
         self.arr = []
+        self.currentIteration = 0
 
     def pop(self):
-        self.arr.pop()
+        return self.arr.pop()
 
     def peek(self):
         return self.arr[-1]
@@ -46,6 +49,18 @@ class stack:
 
     def clear(self):
         self.arr = []
+
+    def addIteration(self):
+        self.currentIteration += 1
+    
+    def subIteration(self):
+        self.currentIteration -= 1
+
+    def getCurrentItems(self):
+        return self.arr[self.currentIteration]
+
+    def getIteration(self):
+        return self.currentIteration
 
 
 class cancelId:
@@ -68,37 +83,101 @@ class cancelId:
 
     def getTime(self):
         return self.time
-8
+
+def getData():
+    with open("song_data.py", "rb") as fp:
+        tempArr = pickle.load(fp)
+
+    return tempArr
+
 def prevSong():
-    if(songStack.length() == 0):
-        return
-    """ player.setSong(songStack.pop())
-    player.play() """
-    return
+    songStack.subIteration()
+    if(nextButton['state'] == DISABLED):
+        nextButton['state'] = NORMAL
+    if(songStack.getIteration() == 0):
+        previousButton['state'] = DISABLED
+    
+    tempArr = songStack.getCurrentItems()
+    for child in tv.get_children():
+        if(tempArr[0] in tv.item(child)['values']):
+            tv.focus(child)
+            tv.selection_set(child)
+            break
+    player.previous()
+    cancelAll()
+    progressBarFunc(getInterval(tempArr[1]))
+
+def nextSong():
+    songStack.addIteration()
+    if(previousButton['state'] == DISABLED):
+        previousButton['state'] = NORMAL
+    if(songStack.getIteration() + 1 == songStack.length()):
+        nextButton['state'] = DISABLED
+    
+    tempArr = songStack.getCurrentItems()
+    for child in tv.get_children():
+        if(tempArr[0] in tv.item(child)['values']):
+            tv.focus(child)
+            tv.selection_set(child)
+            break
+    player.next()
+    cancelAll()
+    progressBarFunc(getInterval(tempArr[1]))
 
 def playSong(song):
+    
     if(hehe.getFlag() == True):
+        global songData
         playButton.configure(image=playImage)
         playButton.image = playImage
         player.stop()
         hehe.setFlag(False)
+        songData = getData()
         songStack.clear()
+        player.__init__()
         cancelAll()
         return
     playButton.configure(image=stopImage)
     playButton.image = stopImage
+    nextButton['state'] = NORMAL
     hehe.setFlag(True)
     temp = tv.item(song, 'values')   
     timeArr = temp[2].split(':')
     timeArr = int(int(timeArr[0])*60) + int(timeArr[1])
     progressBarFunc(int(timeArr*.01*1000))
-    player.setSong(songDir[temp[0]])
-    songStack.add(songDir[temp[0]])
+
+    player.add(songDir[temp[0]])
+    audioTag = TinyTag.get(songDir[temp[0]])
+    for x in range(len(songData)):
+        if(songDir[temp[0]] in songData[x]):
+            if(audioTag.title):
+                songStack.add([audioTag.title, audioTag.duration])
+            else:
+                songStack.add([songDir[temp[0]], audioTag.duration])
+            del songData[x]
+            break
+
+    while True:
+        if(len(songData) == 0):
+            break
+        """ for x in range(len(songData)): """
+        num = random.randint(0, len(songData)-1)
+        audioTag = TinyTag.get(songData[num][0])
+        if(audioTag.title):
+            songStack.add([audioTag.title, audioTag.duration])
+        else:
+            songStack.add([songData[num[0]], audioTag.duration])
+        player.add(songData[num][0])
+            
+        del songData[num]
+        continue
+    
+
     player.play()
     return
 
-def getInterval(songLength):
-    return 
+def getInterval(duration):
+    return int(duration*.01*1000)
 
 def cancelAll():
     arr = hehe.getId()
@@ -114,24 +193,13 @@ def progressBarFunc(time, x = 0):
         root.after_id = root.after(time, lambda: progressBarFunc(time, x+1))
         hehe.add(root.after_id)
     else:
+        if(previousButton['state'] == DISABLED):
+            previousButton['state'] = NORMAL
         temp = PhotoImage(file = "./res/progBars/0-progBar.png")
         progressBar.configure(image=temp)
         progressBar.image = temp
-        playSong(tv.focus())
-    
-def nextSong():
-    nextSongIndex = random.randint(0, len(songData)-1)
-    temp = tv.item(nextSongIndex, 'values')
-    """ if(songStack.search(songDir[temp[0]])):
-        nextSong() """
-    tv.selection_set(nextSongIndex)
-    tv.focus(nextSongIndex)
-    if(hehe.getFlag() == True):
-        player.stop()
-        hehe.setFlag(False)
-        cancelAll()
-    playSong(tv.focus())
-
+        player.next()
+        progressBarFunc()
 
 root = Tk()
 root.geometry("1000x650")
@@ -141,7 +209,7 @@ w = PanedWindow(root)
 controlPanel = PanedWindow(root)
 tv = ttk.Treeview(w, height = 25, selectmode = "browse")
 hehe = cancelId()
-player = playing()
+player = VLC()
 songStack = stack()
 songDir = {}
 
@@ -156,10 +224,9 @@ stopImage = PhotoImage(file = "./res/stopButton.png")
 progBar = PhotoImage(file = "./res/progBars/0-progBar.png")
 progressBar = Label(root, image = progBar, borderwidth=0)
 
-""" playButton = Button(controlPanel, image = playImage, font = fnt, command = cancelAll) """
 playButton = Button(controlPanel, image = playImage, font = fnt, command = lambda: playSong(tv.focus()))
-nextButton = Button(controlPanel, image = nextImage, font = fnt, command = lambda: nextSong())
-previousButton = Button(controlPanel, image = prevImage, font = fnt, command = lambda: prevSong())
+nextButton = Button(controlPanel, image = nextImage, font = fnt, command = lambda: nextSong(), state = DISABLED)
+previousButton = Button(controlPanel, image = prevImage, font = fnt, command = lambda: prevSong(), state = DISABLED)
 
 previousButton.grid(row = 0, column = 0)
 playButton.grid(row = 0, column = 1, padx = 30)
@@ -173,8 +240,7 @@ progressBar.place(x = 315, y = 615)
 detectEmotion.place(x = 12, y = 490)
 controlPanel.place(x = 465, y = 573)
 
-with open("song_data.py", "rb") as fp:
-    songData = pickle.load(fp)
+songData = getData()
 
 tv['columns']=('Title', 'Artist', 'Duration', 'Tempo')
 tv.column('#0', width=0, stretch=NO)
