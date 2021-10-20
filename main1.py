@@ -10,79 +10,8 @@ import time
 from playlist import VLC
 import random
 from tinytag import TinyTag
-
-""" class playing:
-    def __init__(self):
-        self.player = 0
-        self.songHistory = []
-        
-    def play(self):
-        self.player.play()
-
-    def stop(self):
-        self.player.stop()
-
-    def setSong(self, songInfo):
-        self.player = vlc.MediaPlayer(songInfo) """
-
-
-class stack:
-    def __init__(self):
-        self.arr = []
-        self.currentIteration = 0
-
-    def pop(self):
-        return self.arr.pop()
-
-    def peek(self):
-        return self.arr[-1]
-
-    def add(self, item):
-        self.arr.append(item)
-
-    def length(self):
-        return len(self.arr)
-        
-    def search(self, item):
-        if item in self.arr:
-            return True
-
-    def clear(self):
-        self.arr = []
-
-    def addIteration(self):
-        self.currentIteration += 1
-    
-    def subIteration(self):
-        self.currentIteration -= 1
-
-    def getCurrentItems(self):
-        return self.arr[self.currentIteration]
-
-    def getIteration(self):
-        return self.currentIteration
-
-
-class cancelId:
-    def __init__(self):
-        self.id = [] 
-        self.time = 0
-        self.flag = False
-
-    def getFlag(self):
-        return self.flag
-
-    def setFlag(self, value):
-        self.flag = value
-
-    def add(self, num):
-        self.id.append(num)
-
-    def getId(self):
-        return self.id
-
-    def getTime(self):
-        return self.time
+from stack import stack
+from cancel import cancelId
 
 def getData():
     with open("song_data.py", "rb") as fp:
@@ -193,13 +122,13 @@ def progressBarFunc(time, x = 0):
         root.after_id = root.after(time, lambda: progressBarFunc(time, x+1))
         hehe.add(root.after_id)
     else:
-        if(previousButton['state'] == DISABLED):
-            previousButton['state'] = NORMAL
+        if(songStack.getIteration() + 1 == songStack.length()):
+            playSong()
+            return
         temp = PhotoImage(file = "./res/progBars/0-progBar.png")
         progressBar.configure(image=temp)
         progressBar.image = temp
-        player.next()
-        progressBarFunc()
+        nextSong()
 
 root = Tk()
 root.geometry("1000x650")
