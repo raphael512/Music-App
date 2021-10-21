@@ -95,7 +95,7 @@ def playSong(song):
         if(audioTag.title):
             songStack.add([audioTag.title, audioTag.duration])
         else:
-            songStack.add([songData[num[0]], audioTag.duration])
+            songStack.add([songData[num][0], audioTag.duration])
         player.add(songData[num][0])
             
         del songData[num]
