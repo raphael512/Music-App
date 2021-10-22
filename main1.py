@@ -7,17 +7,48 @@ from tkinter import font
 import pickle
 import vlc
 import time
+import ai
 from playlist import VLC
 import random
 from tinytag import TinyTag
 from stack import stack
 from cancel import cancelId
 
+def countdown():
+    wnd = Toplevel()
+    wnd.title("Smile!")
+
+    x = root.winfo_x()
+    y = root.winfo_y()
+    wnd.minsize(300, 300)
+    wnd.geometry("+%d+%d" % (x + 400, y + 200))
+    smileLabel = Label(wnd, text = "SMILE!", font = 'Helvetica 56 bold')
+    smileLabel.place(x = 30, y = 5)
+    countLabel = Label(wnd, text = "3", font = 'Helvetica 92 bold')
+    countLabel.place(x = 115, y = 80)
+    wnd.after(1000, lambda: changeLabel(countLabel, '2'))
+    wnd.after(2000, lambda: changeLabel(countLabel, '1'))
+    wnd.after(3000, lambda: changeLabel(countLabel, '0'))
+    wnd.after(4000, detectEmotionFunc)
+
+def detectEmotionFunc():
+    ai.img_capture()
+    emotion = ai.detect_emotion()
+    if(emotion == 0):
+        messagebox.showwarning("Warning!", "No face detected")
+        return
+
+    messagebox.showinfo("Hi", "You are " + str(emotion))
+    
+
 def getData():
     with open("song_data.py", "rb") as fp:
         tempArr = pickle.load(fp)
 
     return tempArr
+
+def changeLabel(lbl, txt):
+    lbl['text'] = txt
 
 def prevSong():
     songStack.subIteration()
@@ -144,7 +175,7 @@ songDir = {}
 
 
 lbl = Label(root, text = "My Music", font = 'Helvetica 18 bold')
-detectEmotion = Button(root, text = "DETECT EMOTION", font = 'Arial 11 bold', background = "#AED5C0")
+detectEmotion = Button(root, text = "DETECT EMOTION", font = 'Arial 11 bold', background = "#AED5C0", command = countdown)
 
 playImage = PhotoImage(file = "./res/playButton.png")
 nextImage = PhotoImage(file = "./res/nextButton.png")
@@ -152,6 +183,10 @@ prevImage = PhotoImage(file = "./res/prevButton.png")
 stopImage = PhotoImage(file = "./res/stopButton.png")
 progBar = PhotoImage(file = "./res/progBars/0-progBar.png")
 progressBar = Label(root, image = progBar, borderwidth=0)
+
+scrollBar = ttk.Scrollbar(root, orient ="vertical", command = tv.yview)
+scrollBar.pack(side = 'right', fill = 'y')
+tv.configure(yscrollcommand = scrollBar.set)
 
 playButton = Button(controlPanel, image = playImage, font = fnt, command = lambda: playSong(tv.focus()))
 nextButton = Button(controlPanel, image = nextImage, font = fnt, command = lambda: nextSong(), state = DISABLED)

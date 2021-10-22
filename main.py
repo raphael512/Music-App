@@ -43,8 +43,11 @@ if(songDirectory == ""):
     for x in glob(songDirectory + "/**/*.mp3"):
         songs.append(x)
 
+    num = 0
     #Dito kukunin na yung data nung mga kanta. Eto yung BPM, Title, saka artist
     for x in songs:
+        print(num)
+        num += 1
         y, sr = librosa.load(x)
         audioFile = TinyTag.get(x)
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
