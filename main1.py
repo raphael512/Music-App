@@ -14,6 +14,8 @@ from tinytag import TinyTag
 from stack import stack
 from cancel import cancelId
 
+
+#Eto yung big countdown pag pinindot yung detect emotion
 def countdown():
     wnd = Toplevel()
     wnd.title("Smile!")
@@ -31,6 +33,9 @@ def countdown():
     wnd.after(3000, lambda: changeLabel(countLabel, '0'))
     wnd.after(4000, detectEmotionFunc)
 
+
+#After nung countdown, ico-call to para magcapture ng image tapos makita yung emotion ni user
+#CHECK MO YUNG AI.PY PARA DUN SA IMG_CAPTURE() SAKA DETECT_EMOTION()
 def detectEmotionFunc():
     ai.img_capture()
     emotion = ai.detect_emotion()
@@ -40,16 +45,19 @@ def detectEmotionFunc():
 
     messagebox.showinfo("Hi", "You are " + str(emotion))
     
-
+#Function para makuha yung data sa main.py
 def getData():
     with open("song_data.py", "rb") as fp:
         tempArr = pickle.load(fp)
 
     return tempArr
 
+#Function para palitan yung text ng isang label
 def changeLabel(lbl, txt):
     lbl['text'] = txt
 
+
+#Function para mag previous song
 def prevSong():
     songStack.subIteration()
     if(nextButton['state'] == DISABLED):
@@ -67,6 +75,8 @@ def prevSong():
     cancelAll()
     progressBarFunc(getInterval(tempArr[1]))
 
+
+#Function para sa next button
 def nextSong():
     songStack.addIteration()
     if(previousButton['state'] == DISABLED):
@@ -84,8 +94,11 @@ def nextSong():
     cancelAll()
     progressBarFunc(getInterval(tempArr[1]))
 
+
+#Function pag pinindot yung play button.
 def playSong(song):
     
+    #If may pinapatugtog na yung player and pinindot yung stop button, dito siya pupunta sa if statement na to para mastop
     if(hehe.getFlag() == True):
         global songData
         playButton.configure(image=playImage)
@@ -97,6 +110,8 @@ def playSong(song):
         player.__init__()
         cancelAll()
         return
+    
+    #If wala pang pinapatugtog yung player, dito siya
     playButton.configure(image=stopImage)
     playButton.image = stopImage
     nextButton['state'] = NORMAL
@@ -136,15 +151,18 @@ def playSong(song):
     player.play()
     return
 
+#Function para makuha yung interval kung ilang seconds bago madagdagan yung progress bar
 def getInterval(duration):
     return int(duration*.01*1000)
 
+
+#Function para mastop yung progress bar pag pinindot ni user yung stop button
 def cancelAll():
     arr = hehe.getId()
     for x in arr:
         root.after_cancel(x)
 
-
+#Function para maupdate yung progress bar
 def progressBarFunc(time, x = 0):
     if(x+1) < 100:
         temp = PhotoImage(file = "./res/progBars/"+ str(x) +"-progBar.png")
@@ -161,22 +179,43 @@ def progressBarFunc(time, x = 0):
         progressBar.image = temp
         nextSong()
 
-root = Tk()
-root.geometry("1000x650")
-root.title("MoodSic")
-fnt = font.Font(size = 12)
-w = PanedWindow(root)
-controlPanel = PanedWindow(root)
-tv = ttk.Treeview(w, height = 25, selectmode = "browse")
+
+#Initialize ng variable
+#Yung hehe wag mo pansinin yan HAHAHAHA HINDI KO DIN ALAM PANO GUMAGANA YAN
 hehe = cancelId()
+
+#eto yung vlc player. bale gumawa siya ng object ng vlc. Check mo yung playlist.py para sa methods saka functions niya.
 player = VLC()
+
+#Eto is stack lang siya xd. Wala kasing stack sa python kaya gumawa lang ako. Same lang sa java, check mo din yung stack.py para sa methods.
 songStack = stack()
 songDir = {}
 
 
+#Initialize ng tkinter
+root = Tk()
+root.geometry("1000x650")
+root.title("MoodSic")
+fnt = font.Font(size = 12)
+
+
+#Initialize ng mga subwindow sa loob ng tkinter. Yung w yung para sa song list, yung control panel yung mga buttons.
+w = PanedWindow(root)
+controlPanel = PanedWindow(root)
+
+#tv yung listahan ng kanta na nasa gui
+tv = ttk.Treeview(w, height = 25, selectmode = "browse")
+
+#Scollbar para sa treeview
+scrollBar = ttk.Scrollbar(root, orient ="vertical", command = tv.yview)
+scrollBar.pack(side = 'right', fill = 'y')
+tv.configure(yscrollcommand = scrollBar.set)
+
+#Initialize lang ng label and buttons.
 lbl = Label(root, text = "My Music", font = 'Helvetica 18 bold')
 detectEmotion = Button(root, text = "DETECT EMOTION", font = 'Arial 11 bold', background = "#AED5C0", command = countdown)
 
+#Initialize ng mga images para sa buttons and progressbars.
 playImage = PhotoImage(file = "./res/playButton.png")
 nextImage = PhotoImage(file = "./res/nextButton.png")
 prevImage = PhotoImage(file = "./res/prevButton.png")
@@ -184,28 +223,31 @@ stopImage = PhotoImage(file = "./res/stopButton.png")
 progBar = PhotoImage(file = "./res/progBars/0-progBar.png")
 progressBar = Label(root, image = progBar, borderwidth=0)
 
-scrollBar = ttk.Scrollbar(root, orient ="vertical", command = tv.yview)
-scrollBar.pack(side = 'right', fill = 'y')
-tv.configure(yscrollcommand = scrollBar.set)
 
+#Initialize ng mga buttons.
 playButton = Button(controlPanel, image = playImage, font = fnt, command = lambda: playSong(tv.focus()))
 nextButton = Button(controlPanel, image = nextImage, font = fnt, command = lambda: nextSong(), state = DISABLED)
 previousButton = Button(controlPanel, image = prevImage, font = fnt, command = lambda: prevSong(), state = DISABLED)
 
+#Placement ng buttons sa controlpanel.
 previousButton.grid(row = 0, column = 0)
 playButton.grid(row = 0, column = 1, padx = 30)
 nextButton.grid(row = 0, column = 2)
 
 
-
+#placements ng mga widgets
 lbl.place(x = 170, y = 0)
 w.place(x = 170, y = 40)
 progressBar.place(x = 315, y = 615)
 detectEmotion.place(x = 12, y = 490)
 controlPanel.place(x = 465, y = 573)
 
+
+#Andito yung songdata na nakuha sa main.py
 songData = getData()
 
+
+#Tree view lang ito
 tv['columns']=('Title', 'Artist', 'Duration', 'Tempo')
 tv.column('#0', width=0, stretch=NO)
 tv.column('Title', anchor=CENTER, width=400)
