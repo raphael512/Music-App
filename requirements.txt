@@ -4,3 +4,6 @@ librosa
 ffmpeg-python
 python-vlc
 glob
+fer
+h5py==2.10.0
+numpy=1.19.2

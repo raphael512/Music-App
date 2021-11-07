@@ -30,7 +30,7 @@ if(songDirectory == ""):
     temp.write('songDirectory = "' + songDirectory + '"')
     messagebox.showinfo("Success!", "Song directory found, please wait. This will take a long time depending on the number of music you have.")
 
-    #Dito i-check na ni user if may flac and mp3 files yung folder ni user. Kasama na dito yung mga subfolder nung given directory.
+    #Dito i-check na ni tool(edited) if may flac and mp3 files yung folder ni user. Kasama na dito yung mga subfolder nung given directory.
     for x in glob(songDirectory + "/*.flac"):
         songs.append(x)
 

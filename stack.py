@@ -14,7 +14,7 @@ class stack:
 
     def length(self):
         return len(self.arr)
-        
+
     def search(self, item):
         if item in self.arr:
             return True
@@ -24,7 +24,7 @@ class stack:
 
     def addIteration(self):
         self.currentIteration += 1
-    
+
     def subIteration(self):
         self.currentIteration -= 1
 
@@ -33,3 +33,6 @@ class stack:
 
     def getIteration(self):
         return self.currentIteration
+
+    def printArray(self):
+        print(self.arr)

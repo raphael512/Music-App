@@ -12,8 +12,10 @@ def img_capture():
         cv2.imwrite('test.jpg',image)
         camera.release()
         cv2.destroyAllWindows()
+        # return 0
     except:
         messagebox.showwarning("Warning", "No camera device detected!")
+        # return 1
 
 def img_enhance():
     img = Image.open("test.jpg")
@@ -38,5 +40,3 @@ def detect_emotion():
     if(x == 10):
         messagebox.showwarning("Warning", "No face detected")
     return 0
-
-

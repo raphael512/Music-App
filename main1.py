@@ -15,6 +15,114 @@ from stack import stack
 from cancel import cancelId
 
 
+#function para sa pagkuha ng bagong file hehe
+def getSpecific():
+    with open("song_data1.py", "rb") as fp:
+        tempArr2 = pickle.load(fp)
+
+    return tempArr2
+
+#display ng playlist
+def generatePlaylist(bpmfloor, bpmceiling):
+    songStack.__init__()
+    songDir.clear()
+    tempGen = []
+    hold = []
+    for x in range(len(songData)):
+        if (int(songData[x][1]) >= bpmfloor and int(songData[x][1]) <= bpmceiling):
+            tempGen.append(songData[x])
+        #create na rin dito ng playlist. bale mag-aadd na sa stack dito pa lang imbis na sa play song
+            if(int(songData[x][2])%60 < 10):
+               if(songData[x][3] == None):
+                  songDir[songData[x][0]] = songData[x][0]
+                  tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
+               else:
+                  songDir[songData[x][3]] = songData[x][0]
+                  tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
+            else:
+               if(songData[x][3] == None):
+                  songDir[songData[x][0]] = songData[x][0]
+                  tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
+               else:
+                  songDir[songData[x][3]] = songData[x][0]
+                  tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
+
+    hold = sorted(tempGen, key=lambda x: x[1])
+    tempGen = hold           
+    with open("song_data1.py", "wb") as fp:
+        pickle.dump(tempGen, fp)
+    global songEmoData
+    songEmoData = getSpecific()
+    tv.pack(fill = "x")
+    temp = [tempGen[0][3], tempGen[0][2]]
+    songStack.add([temp[0], temp[1]])
+    player.add(songDir[temp[0]]) #idadagdag yung song directory ng <title> sa playlist
+
+    for x in range(len(songEmoData)):
+        if(x == 0):
+            continue
+        if(songDir[tempGen[x][3]] in songEmoData[x]):
+            songStack.add([tempGen[x][3], tempGen[x][1]])
+            player.add(tempGen[x][0])
+            # del songEmoData[x]
+            # break
+
+    # while True:
+    #     if(len(songEmoData) == 0):
+    #         break
+    #     """ for x in range(len(songData)): """
+    #     num = random.randint(0, len(songEmoData)-1)
+    #     songStack.add([tempGen[x][0], tempGen[x][1]])
+    #     player.add(songEmoData[num][0])
+    #
+    #     del songEmoData[num]
+    #     continue
+
+    player.play()
+    playButton.configure(image=stopImage)
+    playButton.image = stopImage
+    playButton.configure(command = lambda: playSongEmotion(tv.focus()))
+    nextButton['state'] = NORMAL
+    hehe.setFlag(True)
+
+    tempArr = songStack.getCurrentItems()
+    for child in tv.get_children():
+        if(tempArr[0] in tv.item(child)['values']):
+            tv.focus(child)
+            tv.selection_set(child)
+            break
+
+    progressBarFunc(int(tempGen[0][2]*.01*1000))
+
+
+def createPlaylist(emotion):
+     if emotion == 'sad':
+        generatePlaylist(0, 100)
+     elif emotion == 'happy':
+        generatePlaylist(81, 130)
+     elif emotion == 'angry':
+        generatePlaylist(130, 1015)
+     else:
+        generatePlaylist(0, 1015)
+
+
+def newInst():
+    for x in range(len(songData)):
+      if(int(songData[x][2])%60 < 10):
+         if(songData[x][3] == None):
+            songDir[songData[x][0]] = songData[x][0]
+            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
+         else:
+            songDir[songData[x][3]] = songData[x][0]
+            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
+      else:
+         if(songData[x][3] == None):
+            songDir[songData[x][0]] = songData[x][0]
+            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
+         else:
+            songDir[songData[x][3]] = songData[x][0]
+            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
+
 #Eto yung big countdown pag pinindot yung detect emotion
 def countdown():
     wnd = Toplevel()
@@ -37,14 +145,20 @@ def countdown():
 #After nung countdown, ico-call to para magcapture ng image tapos makita yung emotion ni user
 #CHECK MO YUNG AI.PY PARA DUN SA IMG_CAPTURE() SAKA DETECT_EMOTION()
 def detectEmotionFunc():
-    ai.img_capture()
+    num = ai.img_capture()
+    # if(num == 0):
     emotion = ai.detect_emotion()
+        # return
     if(emotion == 0):
         messagebox.showwarning("Warning!", "No face detected")
-        return
+        # return
 
     messagebox.showinfo("Hi", "You are " + str(emotion))
-    
+
+    #Ipapasa niya yung emotion sa cP function para makapagDISPLAY
+    tv.delete(*tv.get_children())  #para madelete yung nakadisplay na playlist
+    createPlaylist(emotion)
+
 #Function para makuha yung data sa main.py
 def getData():
     with open("song_data.py", "rb") as fp:
@@ -64,7 +178,7 @@ def prevSong():
         nextButton['state'] = NORMAL
     if(songStack.getIteration() == 0):
         previousButton['state'] = DISABLED
-    
+
     tempArr = songStack.getCurrentItems()
     for child in tv.get_children():
         if(tempArr[0] in tv.item(child)['values']):
@@ -78,11 +192,13 @@ def prevSong():
 
 #Function para sa next button
 def nextSong():
+    print(songStack.printArray())
     songStack.addIteration()
     if(previousButton['state'] == DISABLED):
         previousButton['state'] = NORMAL
     if(songStack.getIteration() + 1 == songStack.length()):
         nextButton['state'] = DISABLED
+
     
     tempArr = songStack.getCurrentItems()
     for child in tv.get_children():
@@ -95,7 +211,8 @@ def nextSong():
     progressBarFunc(getInterval(tempArr[1]))
 
 
-#Function pag pinindot yung play button.
+# Function pag pinindot yung play button.
+# function ni raph. gawa ka background
 def playSong(song):
     
     #If may pinapatugtog na yung player and pinindot yung stop button, dito siya pupunta sa if statement na to para mastop
@@ -106,22 +223,26 @@ def playSong(song):
         player.stop()
         hehe.setFlag(False)
         songData = getData()
-        songStack.clear()
+        songStack.__init__()
         player.__init__()
         cancelAll()
         return
-    
+
     #If wala pang pinapatugtog yung player, dito siya
     playButton.configure(image=stopImage)
     playButton.image = stopImage
     nextButton['state'] = NORMAL
     hehe.setFlag(True)
-    temp = tv.item(song, 'values')   
+    temp = tv.item(song, 'values')
     timeArr = temp[2].split(':')
     timeArr = int(int(timeArr[0])*60) + int(timeArr[1])
     progressBarFunc(int(timeArr*.01*1000))
 
-    player.add(songDir[temp[0]])
+    #player = playlist na tunay talaga
+    #songstack = focus (highlight ng title na nagpeplay) and progress bar
+
+    #temp = array of values. 0 = title, 1 artist, 2 duration, 3 bpm
+    player.add(songDir[temp[0]]) #idadagdag yung song directory ng <title> sa playlist
     audioTag = TinyTag.get(songDir[temp[0]])
     for x in range(len(songData)):
         if(songDir[temp[0]] in songData[x]):
@@ -143,11 +264,45 @@ def playSong(song):
         else:
             songStack.add([songData[num][0], audioTag.duration])
         player.add(songData[num][0])
-            
+
         del songData[num]
         continue
-    
 
+    player.play()
+    return
+
+#Eto version ko ng playsong function
+
+def playSongEmotion(song):
+    #stop button pressed
+    if(hehe.getFlag() == True):
+        global songEmoData
+        playButton.configure(image=playImage)
+        playButton.image = playImage
+        player.stop()
+        hehe.setFlag(False)
+        songData = getSpecific()
+        # songStack.clear()
+        # player.__init__()
+        cancelAll()
+        return
+
+    #If wala pang pinapatugtog yung player, dito siya
+    playButton.configure(image=stopImage)
+    playButton.image = stopImage
+    nextButton['state'] = NORMAL
+    hehe.setFlag(True)
+    temp = tv.item(song, 'values')
+    timeArr = temp[2].split(':')
+    timeArr = int(int(timeArr[0])*60) + int(timeArr[1])
+    progressBarFunc(int(timeArr*.01*1000))
+
+    #player = playlist na tunay talaga
+    #songstack = focus (highlight ng title na nagpeplay) and progress bar
+
+    #temp = array of values. 0 = title, 1 artist, 2 duration, 3 bpm
+
+    print(songDir)
     player.play()
     return
 
@@ -178,7 +333,6 @@ def progressBarFunc(time, x = 0):
         progressBar.configure(image=temp)
         progressBar.image = temp
         nextSong()
-
 
 #Initialize ng variable
 #Yung hehe wag mo pansinin yan HAHAHAHA HINDI KO DIN ALAM PANO GUMAGANA YAN
@@ -245,6 +399,7 @@ controlPanel.place(x = 465, y = 573)
 
 #Andito yung songdata na nakuha sa main.py
 songData = getData()
+songEmoData = getSpecific()
 
 
 #Tree view lang ito
@@ -261,23 +416,11 @@ tv.heading('Artist', text='Artist', anchor=CENTER)
 tv.heading('Duration', text='Duration', anchor=CENTER)
 tv.heading('Tempo', text='Tempo', anchor=CENTER)
 
-for x in range(len(songData)):
-    if(int(songData[x][2])%60 < 10):
-        if(songData[x][3] == None):
-            songDir[songData[x][0]] = songData[x][0]
-            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
-        else:
-            songDir[songData[x][3]] = songData[x][0]
-            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':0' + str(int(songData[x][2])%60), int(songData[x][1])))
-    else:
-        if(songData[x][3] == None):
-            songDir[songData[x][0]] = songData[x][0]
-            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][0], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
-        else:
-            songDir[songData[x][3]] = songData[x][0]
-            tv.insert(parent='', index=x, iid=x, text='', values=(songData[x][3], songData[x][4], str(int(songData[x][2]/60)) + ':' + str(int(songData[x][2])%60), int(songData[x][1])))
+#call every new instance ng app para makapagdisplay ng playlist.
+newInst();
+
+#[song directory, tempo, duration, title, artist] po
+#
+#      tv.pack(fill = "x")
 tv.pack(fill = "x")
-
-
-
 root.mainloop()
