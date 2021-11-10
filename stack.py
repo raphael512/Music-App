@@ -3,6 +3,9 @@ class stack:
         self.arr = []
         self.currentIteration = 0
 
+    def goBack(self):
+        self.currentIteration = 0
+
     def pop(self):
         return self.arr.pop()
 

@@ -1,7 +1,7 @@
 from fer import FER
 import cv2
 from tkinter import messagebox
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageOps
 import matplotlib.pyplot as plt
 
 def img_capture():
@@ -10,6 +10,7 @@ def img_capture():
         return_value,image = camera.read()
         gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         cv2.imwrite('test.jpg',image)
+        cv2.imwrite('testbase.jpg',image)
         camera.release()
         cv2.destroyAllWindows()
         # return 0
@@ -18,12 +19,9 @@ def img_capture():
         # return 1
 
 def img_enhance():
-    img = Image.open("test.jpg")
-    enhancer = ImageEnhance.Brightness(img)
-
-    factor = 1.5
-    im_output = enhancer.enhance(factor)
-    im_output.save("test.jpg")
+    im1 = Image.open("test.jpg")
+    im2 = ImageOps.equalize(im1, mask = None)
+    im2.save("test.jpg")
 
 def detect_emotion():
     for x in range(10):

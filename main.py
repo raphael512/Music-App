@@ -45,6 +45,7 @@ if(songDirectory == ""):
 
     #Dito kukunin na yung data nung mga kanta. Eto yung BPM, Title, saka artist
     for x in songs:
+        print(x)
         y, sr = librosa.load(x)
         audioFile = TinyTag.get(x)
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
@@ -68,4 +69,3 @@ if(songDirectory == ""):
     #If successful, ty ulit
     else:
         messagebox.showinfo("Success!", "Audio loading finished, please restart the program")
-
