@@ -13,7 +13,15 @@ import random
 from tinytag import TinyTag
 from stack import stack
 from cancel import cancelId
+from PIL import Image, ImageTk
+import os
 
+
+def on_closing():
+    """ player.stop()
+    root.destroy()
+    cancelAll() """
+    quit()
 
 #function for passing data to Stack/playlist
 def addToStack(source):
@@ -146,7 +154,33 @@ def detectEmotionFunc():
     if(emotion == 0):
         messagebox.showwarning("Warning!", "No face detected")
 
-    messagebox.showinfo("Hi", "You are " + str(emotion))
+    """ messagebox.showinfo("Hi", "You are " + str(emotion)) """
+    emoWnd = Toplevel()
+    emoWnd.title("EmoWind!")
+
+    x = root.winfo_x()
+    y = root.winfo_y()
+    emoWnd.minsize(500, 500)
+    emoWnd.geometry("+%d+%d" % (x + 400, y + 200))
+
+    rel = "\\test.jpg"
+    rel = str(os.getcwd()) + rel
+    print(rel)
+    img = Image.open(rel)
+    img = img.resize((400, 400), Image.ANTIALIAS)
+    img1 = ImageTk.PhotoImage(img)
+
+    wndImage = Label(emoWnd, image = img1)
+    wndImage.img = img1
+
+
+    wndLabel = Label(emoWnd, text = "You are " + emotion, font = 'Helvetica 32 bold')
+
+    wndBtn = Button(emoWnd, text = "Ok", command = lambda: emoWnd.destroy())
+
+    wndLabel.pack()
+    wndImage.pack()
+    wndBtn.pack()
 
     #Ipapasa niya yung emotion sa cP function para makapagDISPLAY
     tv.delete(*tv.get_children())  #para madelete yung nakadisplay na playlist
@@ -403,4 +437,6 @@ addToStack(songData);
 #
 #      tv.pack(fill = "x")
 tv.pack(fill = "x")
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
