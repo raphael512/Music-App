@@ -1,4 +1,4 @@
-from fer import FER
+from ferr import FER
 import cv2
 from tkinter import messagebox
 from PIL import Image, ImageOps
@@ -38,3 +38,7 @@ def detect_emotion():
     if(x == 10):
         messagebox.showwarning("Warning", "No face detected")
     return 0
+
+if(__name__ == "__main__"):
+    emo = detect_emotion()
+    print(emo)
