@@ -9,7 +9,6 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 from tensorflow.keras.models import load_model
 
-from fer.exceptions import InvalidImage
 
 from typing import Sequence, Tuple, Union
 NumpyRects = Union[np.ndarray, Sequence[Tuple[int, int, int, int]]]
@@ -174,8 +173,6 @@ class FER(object):
         :param img: image to process (BGR or gray)
         :return: list containing all the bounding boxes detected with their emotions.
         """
-        if img is None or not hasattr(img, "shape"):
-            raise InvalidImage("Image not valid.")
 
         emotion_labels = self._get_labels()
 
