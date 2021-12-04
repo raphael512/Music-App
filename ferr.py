@@ -1,36 +1,4 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
-# MIT License
-#
-# Copyright (c) 2018 Justin Shenk
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
 import logging
-
-# IMPORTANT:
-#
-# This code is derived from Iván de Paz Centeno's implementation of MTCNN
-# (https://github.com/ipazc/mtcnn/) and Octavia Arriaga's facial expression recognition repo
-# (https://github.com/oarriaga/face_classification).
-#
 import os
 import sys
 
@@ -86,7 +54,7 @@ class FER(object):
 
         if mtcnn:
             try:
-                from mtcnn.mtcnn import MTCNN
+                from mtcnn import MTCNN
             except ImportError:
                 raise Exception(
                     "MTCNN not installed, install it with pip install mtcnn"
@@ -267,26 +235,3 @@ class FER(object):
         score = emotions[0]["emotions"][top_emotion]
 
         return top_emotion, score
-
-"""
-def parse_arguments(args):
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image", type=str, help="Image filepath")
-    return parser.parse_args()
-
-
-def top_emotion():
-    args = parse_arguments(sys.argv)
-    fer = FER()
-    top_emotion, score = fer.top_emotion(args.image)
-    print(top_emotion, score)
-
-
-def main():
-    top_emotion() """
-
-
-""" if __name__ == "__main__":
-    main() """
