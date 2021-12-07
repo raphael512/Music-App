@@ -22,7 +22,6 @@ class StageStatus(object):
         s = self
         s.dy, s.edy, s.dx, s.edx, s.y, s.ey, s.x, s.ex, s.tmpw, s.tmph = pad_result
 
-
 class MTCNN(object):
     """
     Allows to perform MTCNN Detection ->
@@ -32,14 +31,6 @@ class MTCNN(object):
 
     def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_threshold: list = None,
                  scale_factor: float = 0.709):
-        """
-        Initializes the MTCNN.
-        :param weights_file: file uri with the weights of the P, R and O networks from MTCNN. By default it will load
-        the ones bundled with the package.
-        :param min_face_size: minimum size of the face to detect
-        :param steps_threshold: step's thresholds values
-        :param scale_factor: scale factor
-        """
         if steps_threshold is None:
             steps_threshold = [0.6, 0.7, 0.7]
 
@@ -77,12 +68,6 @@ class MTCNN(object):
 
     @staticmethod
     def __scale_image(image, scale: float):
-        """
-        Scales the image to a given scale.
-        :param image:
-        :param scale:
-        :return:
-        """
         height, width, _ = image.shape
 
         width_scaled = int(np.ceil(width * scale))
@@ -132,14 +117,6 @@ class MTCNN(object):
 
     @staticmethod
     def __nms(boxes, threshold, method):
-        """
-        Non Maximum Suppression.
-
-        :param boxes: np array with bounding boxes.
-        :param threshold:
-        :param method: NMS method to apply. Available values ('Min', 'Union')
-        :return:
-        """
         if boxes.size == 0:
             return np.empty((0, 3))
 

@@ -31,13 +31,13 @@ def detect_emotion():
 
         try:
             emotion, score = detector.top_emotion(img)
-            return emotion
+            return (emotion, score)
         except:
             img_enhance()
 
     if(x == 10):
         messagebox.showwarning("Warning", "No face detected")
-    return 0
+    return (0, 0)
 
 if(__name__ == "__main__"):
     emo = detect_emotion()

@@ -150,7 +150,11 @@ def countdown():
 #CHECK MO YUNG AI.PY PARA DUN SA IMG_CAPTURE() SAKA DETECT_EMOTION()
 def detectEmotionFunc():
     num = ai.img_capture()
-    emotion = ai.detect_emotion()
+    emotion, score = ai.detect_emotion()
+    if(score <= 0.70):
+        ai.img_enhance()
+        emotion, score = ai.detect_emotion()
+    print(score)
     if(emotion == 0):
         messagebox.showwarning("Warning!", "No face detected")
 

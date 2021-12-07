@@ -14,12 +14,6 @@ from typing import Sequence, Tuple, Union
 NumpyRects = Union[np.ndarray, Sequence[Tuple[int, int, int, int]]]
 
 class FER(object):
-    """
-    Allows performing Facial Expression Recognition ->
-        a) Detection of faces
-        b) Detection of emotions
-    """
-
     def __init__(
         self,
         cascade_file: str = None,
@@ -31,16 +25,6 @@ class FER(object):
         offsets: tuple = (10, 10),
         compile: bool = False,
     ):
-        """
-        Initializes the face detector and Keras model for facial expression recognition.
-        :param cascade_file: file URI with the Haar cascade for face classification
-        :param mtcnn: use MTCNN network for face detection (not yet implemented)
-        :param emotion_model: file URI with the Keras hdf5 model
-        :param scale_factor: parameter specifying how much the image size is reduced at each image scale
-        :param min_face_size: minimum size of the face to detect
-        :param offsets: padding around face before classification
-        :param compile: value for Keras `compile` argument
-        """
         self.__scale_factor = scale_factor
         self.__min_neighbors = min_neighbors
         self.__min_face_size = min_face_size
@@ -51,17 +35,14 @@ class FER(object):
                 "fer", "data/haarcascade_frontalface_default.xml"
             )
 
-        if mtcnn:
-            try:
-                from mtcnn import MTCNN
-            except ImportError:
-                raise Exception(
-                    "MTCNN not installed, install it with pip install mtcnn"
-                )
-            self.__face_detector = "mtcnn"
-            self._mtcnn = MTCNN()
-        else:
-            self.__face_detector = cv2.CascadeClassifier(cascade_file)
+        try:
+            from mtcnn import MTCNN
+        except ImportError:
+            raise Exception(
+                 "MTCNN not installed, install it with pip install mtcnn"
+            )
+        self.__face_detector = "mtcnn"
+        self._mtcnn = MTCNN()
 
         # Local Keras model
         emotion_model = "models/emotion_model.hdf5"
@@ -105,7 +86,6 @@ class FER(object):
 
     @staticmethod
     def tosquare(bbox):
-        """Convert bounding box to square by elongating shorter side."""
         x, y, w, h = bbox
         if h > w:
             diff = h - w
@@ -121,7 +101,6 @@ class FER(object):
         return (x, y, w, h)
 
     def find_faces(self, img: np.ndarray, bgr=True) -> list:
-        """Image to list of faces bounding boxes(x,y,w,h)"""
         if isinstance(self.__face_detector, cv2.CascadeClassifier):
             if bgr:
                 gray_image_array = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -168,12 +147,6 @@ class FER(object):
         }
 
     def detect_emotions(self, img: np.ndarray, face_rectangles: NumpyRects = None) -> list:
-        """
-        Detects bounding boxes from the specified image with ranking of emotions.
-        :param img: image to process (BGR or gray)
-        :return: list containing all the bounding boxes detected with their emotions.
-        """
-
         emotion_labels = self._get_labels()
 
         if not face_rectangles:
@@ -203,7 +176,6 @@ class FER(object):
                 print("{} resize failed: {}".format(gray_face.shape, e))
                 continue
             
-            # Local Keras model
             gray_face = self.__preprocess_input(gray_face, True)
             gray_face = np.expand_dims(gray_face, 0)
             gray_face = np.expand_dims(gray_face, -1)
